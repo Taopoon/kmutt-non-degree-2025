@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pump Monitoring System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <!-- Minimal geometric pump drop logo -->
+            <svg viewBox="0 0 32 32" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#2a85ff" />
+                  <stop offset="100%" stop-color="#1b5fd6" />
+                </linearGradient>
+              </defs>
+              <path d="M16 2 C16 2 6 12 6 18 a10 10 0 0 0 20 0 C26 12 16 2 16 2z" fill="url(#g)" />
+              <circle cx="16" cy="20" r="4" fill="#ffffff" opacity="0.9" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="title">Pump Monitoring System</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="btnNotifications" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5L4 18v2H20V18Z" fill="none" stroke="#333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="badge" id="notificationCount">3</span>
+          </button>
+          <div class="profile">
+            <button class="profile-button" id="btnProfile" aria-haspopup="menu" aria-expanded="false">
+              <span class="avatar">TP</span>
+              <span class="chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown" id="profileDropdown" role="menu">
+              <button class="dropdown-item" id="btnLogin">Login</button>
+              <button class="dropdown-item" id="btnLogout">Logout</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <aside class="sidebar">
+        <nav class="nav">
+          <a href="#" class="nav-item active" data-page="dashboard">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18Zm-10 0h8v-6H3v6Z" fill="#4a5568"/>
+              </svg>
+            </span>
+            <span class="nav-label">Main Dashboard</span>
+          </a>
+          <a href="#" class="nav-item" data-page="history">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V1l4 4-4 4V3Z" fill="#4a5568"/>
+              </svg>
+            </span>
+            <span class="nav-label">Historical Data</span>
+          </a>
+          <a href="#" class="nav-item admin-only" data-page="users">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm-9 9a9 9 0 0 1 18 0Z" fill="#4a5568"/>
+              </svg>
+            </span>
+            <span class="nav-label">User Management</span>
+          </a>
+          <a href="#" class="nav-item" data-page="settings">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.14 12.94a7.49 7.49 0 0 0 .05-1 7.49 7.49 0 0 0-.05-1l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22L16.9 4.8a7.16 7.16 0 0 0-1.73-1L14.9 1.7a.5.5 0 0 0-.5-.4h-4.8a.5.5 0 0 0-.5.4L8.83 3.8a7.16 7.16 0 0 0-1.73 1L4.63 3.97a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64L4.26 10a7.49 7.49 0 0 0-.05 1 7.49 7.49 0 0 0 .05 1l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46a.5.5 0 0 0 .6.22l2.47-1.06a7.16 7.16 0 0 0 1.73 1l.37 2.1a.5.5 0 0 0 .5.4h4.8a.5.5 0 0 0 .5-.4l.37-2.1a7.16 7.16 0 0 0 1.73-1l2.47 1.06a.5.5 0 0 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64ZM12 15.5A3.5 3.5 0 1 1 15.5 12 3.5 3.5 0 0 1 12 15.5Z" fill="#4a5568"/>
+              </svg>
+            </span>
+            <span class="nav-label">Settings</span>
+          </a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section class="dashboard-grid" id="dashboard">
+          <!-- KPI Summary Cards -->
+          <article class="card kpi-card">
+            <div class="kpi-content">
+              <div class="kpi-label">Total Flow</div>
+              <div class="kpi-value" id="kpiTotalFlow">0 m³</div>
+            </div>
+          </article>
+          <article class="card kpi-card">
+            <div class="kpi-content">
+              <div class="kpi-label">Total Power</div>
+              <div class="kpi-value" id="kpiTotalPower">0 kWh</div>
+            </div>
+          </article>
+          <article class="card kpi-card">
+            <div class="kpi-content">
+              <div class="kpi-label">Run hour</div>
+              <div class="kpi-value" id="kpiRunHour">0 hr</div>
+            </div>
+          </article>
+          <!-- Pump Card -->
+          <article class="card pump-card">
+            <div class="card-header">
+              <h3>Pump Status</h3>
+            </div>
+            <div class="pump-content">
+              <div class="pump-illustration" id="pumpIllustration" aria-label="Submersible Column Pump">
+                <div class="pump-photo">
+                  <img src="assets/img/pump-stop.png" alt="Submersible Pump (STOP)" id="pumpImage" />
+                </div>
+                <div class="pump-status-reading"><span id="valStatus">STOP</span></div>
+              </div>
+              <div class="pump-data">
+                <div class="data-grid">
+                  <div class="data-row"><span>Vavg (V)</span><strong id="valVavg">0</strong></div>
+                  <div class="data-row"><span>Iavg (A)</span><strong id="valIavg">0</strong></div>
+                  <div class="data-row"><span>Power (kW)</span><strong id="valPower">0</strong></div>
+                  <div class="data-row"><span>Flow rate (m³/hr)</span><strong id="valFlow">0</strong></div>
+                  <div class="data-row"><span>Speed (rpm)</span><strong id="valSpeed">0</strong></div>
+                  <div class="data-row"><span>Vibration (mm/sec)</span><strong id="valVibration">0</strong></div>
+                  <div class="data-row"><span>U1 Temp (°C)</span><strong id="valU1Temp">0</strong></div>
+                  <div class="data-row"><span>V1 Temp (°C)</span><strong id="valV1Temp">0</strong></div>
+                  <div class="data-row"><span>W1 Temp (°C)</span><strong id="valW1Temp">0</strong></div>
+                  <div class="data-row"><span>U2 Temp (°C)</span><strong id="valU2Temp">0</strong></div>
+                  <div class="data-row"><span>V2 Temp (°C)</span><strong id="valV2Temp">0</strong></div>
+                  <div class="data-row"><span>W2 Temp (°C)</span><strong id="valW2Temp">0</strong></div>
+                  <div class="data-row"><span>Bearing Front Temp (°C)</span><strong id="valBearingFrontTemp">0</strong></div>
+                  <div class="data-row"><span>Bearing Back Temp (°C)</span><strong id="valBearingBackTemp">0</strong></div>
+                  <div class="data-row"><span>Thurst Bearing Temp (°C)</span><strong id="valThrustBearingTemp">0</strong></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Gauges Card -->
+          <article class="card gauges-card">
+            <div class="card-header">
+              <h3>Electrical Gauges</h3>
+            </div>
+            <div class="gauges-grid">
+              <div class="gauge" data-metric="V1">
+                <canvas width="160" height="160" id="gaugeV1"></canvas>
+                <div class="gauge-label">Voltage Phase 1</div>
+              </div>
+              <div class="gauge" data-metric="V2">
+                <canvas width="160" height="160" id="gaugeV2"></canvas>
+                <div class="gauge-label">Voltage Phase 2</div>
+              </div>
+              <div class="gauge" data-metric="V3">
+                <canvas width="160" height="160" id="gaugeV3"></canvas>
+                <div class="gauge-label">Voltage Phase 3</div>
+              </div>
+              <div class="gauge" data-metric="I1">
+                <canvas width="160" height="160" id="gaugeI1"></canvas>
+                <div class="gauge-label">Current Phase 1</div>
+              </div>
+              <div class="gauge" data-metric="I2">
+                <canvas width="160" height="160" id="gaugeI2"></canvas>
+                <div class="gauge-label">Current Phase 2</div>
+              </div>
+              <div class="gauge" data-metric="I3">
+                <canvas width="160" height="160" id="gaugeI3"></canvas>
+                <div class="gauge-label">Current Phase 3</div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Charts Card -->
+          <article class="card charts-card">
+            <div class="card-header">
+              <h3>Real-time Charts</h3>
+            </div>
+            <div class="charts-grid">
+              <div class="chart-item">
+                <canvas id="chartPower"></canvas>
+                <div class="chart-label">Power (kW)</div>
+              </div>
+              <div class="chart-item">
+                <canvas id="chartVavg"></canvas>
+                <div class="chart-label">Vavg (V)</div>
+              </div>
+              <div class="chart-item">
+                <canvas id="chartIavg"></canvas>
+                <div class="chart-label">Iavg (A)</div>
+              </div>
+              <div class="chart-item">
+                <canvas id="chartFlow"></canvas>
+                <div class="chart-label">Flow rate (m³/hr)</div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Map Card -->
+          <article class="card map-card">
+            <div class="card-header">
+              <h3>Asset Location</h3>
+            </div>
+            <div id="map" class="map"></div>
+          </article>
+        </section>
+        
+        <!-- Historical Page -->
+        <section class="history-page" id="history" style="display:none;">
+          <article class="card history-card">
+            <div class="card-header">
+              <h3>Historical Data</h3>
+            </div>
+            <div class="history-controls">
+              <label for="historyMetric">Metric</label>
+              <select id="historyMetric">
+                <option value="power">Power (kW)</option>
+                <option value="vavg">Vavg (V)</option>
+                <option value="iavg">Iavg (A)</option>
+                <option value="flow">Flow rate (m³/hr)</option>
+                <option value="U1Temp">U1 Temp (°C)</option>
+                <option value="V1Temp">V1 Temp (°C)</option>
+                <option value="W1Temp">W1 Temp (°C)</option>
+                <option value="U2Temp">U2 Temp (°C)</option>
+                <option value="V2Temp">V2 Temp (°C)</option>
+                <option value="W2Temp">W2 Temp (°C)</option>
+                <option value="BearingFrontTemp">Bearing Front Temp (°C)</option>
+                <option value="BearingBackTemp">Bearing Back Temp (°C)</option>
+                <option value="ThrustBearingTemp">Thrust Bearing Temp (°C)</option>
+              </select>
+              <label for="historyStart">Start</label>
+              <input type="datetime-local" id="historyStart" />
+              <label for="historyEnd">End</label>
+              <input type="datetime-local" id="historyEnd" />
+              <button id="historyRefresh" class="btn">Plot</button>
+              <button id="historyExport" class="btn">Export CSV</button>
+            </div>
+            <div class="history-chart">
+              <canvas id="historyChart"></canvas>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="js/app.js"></script>
+  </body>
+  </html>
+
+
