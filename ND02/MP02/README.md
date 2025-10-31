@@ -1,3 +1,3 @@
 # KMUTT-Non-Degree-2025
-## ND1-MP2
+## ND02-MP02
 Panusorn-1210
